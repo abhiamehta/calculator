@@ -14,16 +14,18 @@ export default class Calculator extends React.Component {
           <button onClick={this.addRow}>Add Row</button>
         </div>
         <div>
-          {this.state.calcRows.map(calcRow => {
-            return (
-              <CalculatorRow
-                key={calcRow.id}
-                currentState={calcRow}
-                handleValueChange={this.updateRowValue.bind(this)}
-                deleteRow={this.deleteRow.bind(this)}
-              />
-            );
-          })}
+          {this.state.calcRows && this.state.calcRows.length > 0
+            ? this.state.calcRows.map(calcRow => {
+                return (
+                  <CalculatorRow
+                    key={calcRow.id}
+                    currentState={calcRow}
+                    handleValueChange={this.updateRowValue.bind(this)}
+                    deleteRow={this.deleteRow.bind(this)}
+                  />
+                );
+              })
+            : "Please Add A Row for calculation"}
         </div>
         <div>Total : {this.state.processedValue}</div>
       </div>
@@ -53,6 +55,19 @@ export default class Calculator extends React.Component {
     }
   };
   deleteRow = value => {
-
+    let updatedSum = 0;
+    let updatedValues = this.state.calcRows.filter(row => {
+      return row.id !== value.id;
+    });
+    if (updatedValues && updatedValues.length > 1) {
+      updatedSum = updatedValues.reduce((total, updatedRow) => {
+        const tot = total || total.value;
+        return tot + updatedRow.value;
+      });
+    } else {
+      updatedSum = updatedValues.length !== 0 ? updatedValues[0].value : 0;
+    }
+    this.setState({ calcRows: updatedValues });
+    this.setState({ processedValue: updatedSum });
   };
 }
